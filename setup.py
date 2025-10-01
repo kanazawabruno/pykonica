@@ -11,7 +11,7 @@ from shutil import rmtree
 
 from setuptools import find_packages, setup, Command
 
-NAME = 'pykonica'
+NAME = 'konica'
 DESCRIPTION = 'Python package for Konica Minolta Devices'
 URL = 'https://github.com/doulwyi/pykonica'
 EMAIL = 'kanazawabruno@gmail.com.com'
