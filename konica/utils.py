@@ -14,14 +14,14 @@
  Set Hold status                                   55 
 """
 
-from serial import Serial, PARITY_NONE, STOPBITS_ONE, EIGHTBITS, PARITY_EVEN, STOPBITS_TWO, SEVENBITS
+from serial import Serial, PARITY_EVEN, STOPBITS_ONE, SEVENBITS
 from serial.tools import list_ports
 import logging
 from time import sleep
 
 log = logging.getLogger(__name__)
 
-cl200a_cmd_dict = {'command_01': '',
+cl200a_cmd_dict = {'command_01': '00011200',
                    'command_02': '00021200',
                    'command_03': '00031200',
                    'command_08': '00081200',
@@ -57,15 +57,14 @@ def connection_konica(ser):
     """Switch the CL-200A to PC connection mode. (Command "54").
     In order to perform communication with a PC, this command must be used to set the CL-200A to PC connection mode.
     """
-    # cmd_request = utils.cmd_formatter(self.cl200a_cmd_dict['command_54'])
-    cmd_request = chr(2) + '00541   ' + chr(3) + '13\r\n'
+    cmd_request = cmd_formatter(cl200a_cmd_dict['command_54'])
     cmd_response = cmd_formatter(cl200a_cmd_dict['command_54r'])
     return_connection = None
     for i in range(2):
         write_serial_port(ser=ser, cmd=cmd_request, sleep_time=0.5)
         pc_connected_mode = ser.readline().decode('ascii')
-        ser.flushInput()
-        ser.flushOutput()
+        ser.reset_input_buffer()
+        ser.reset_output_buffer()
         # Check that the response from the CL-200A is correct.
         if cmd_response in pc_connected_mode:
             return_connection = True
@@ -85,7 +84,7 @@ def serial_port_luxmeter():
     port = None
     ser = None
     for comport in comports:
-        ser = connect_serial_port(port=comport, parity=PARITY_EVEN, bytesize=SEVENBITS, stopbits=STOPBITS_TWO)
+        ser = connect_serial_port(port=comport, parity=PARITY_EVEN, bytesize=SEVENBITS, stopbits=STOPBITS_ONE)
         konica = connection_konica(ser=ser)
         if konica:
             port = comport
@@ -96,8 +95,8 @@ def serial_port_luxmeter():
     return port
 
 
-def connect_serial_port(port, baudrate=9600, parity=PARITY_NONE,
-                        stopbits=STOPBITS_ONE, bytesize=EIGHTBITS, timeout=3):
+def connect_serial_port(port, baudrate=9600, parity=PARITY_EVEN,
+                        stopbits=STOPBITS_ONE, bytesize=SEVENBITS, timeout=3):
     """
     Perform serial connection
     :param port: Int containing the COM port.
@@ -132,7 +131,7 @@ def cmd_formatter(cmd):
     to_hex = ([hex(ord(c)) for c in cmd + etx])
     for i in to_hex:
         j ^= int(i, base=16)
-    bcc = str(j).zfill(2)
+    bcc = format(j, '02X')
     return stx + cmd + etx + bcc + delimiter
 
 
