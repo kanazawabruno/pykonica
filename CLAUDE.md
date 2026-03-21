@@ -2,27 +2,30 @@
 
 ## Project Overview
 
-**pykonica** is a Python package for controlling Konica Minolta CL-200A Chroma Meter devices via RS-232 serial communication. It provides a programmatic interface and CLI for reading luminance/chromaticity measurements.
+**pykonica** is a Python package for controlling Konica Minolta measurement devices via serial communication. It supports the CL-200A Chroma Meter and CA-410 Display Color Analyzer (also compatible with CA-210/CA-310).
 
 - **License**: MIT
 - **Python**: >=3.10
 - **Package name**: `konica`
 - **Version**: 2.0.0 (defined in `konica/version.py`)
-- **Communication spec**: KMSE CS-A32T.0100
+- **CL-200A spec**: KMSE CS-A32T.0100
+- **CA-410 spec**: CA-410 Communication Specifications v1.08
 
 ## Repository Structure
 
 ```
 konica/                  # Main package
-├── cl200a.py            # ChromaMeterKonica class - device interface, NamedTuple result types
-├── exceptions.py        # Custom exception hierarchy (CL200AError base)
+├── cl200a.py            # ChromaMeterKonica class - CL-200A device interface
+├── ca410.py             # ColorAnalyzerCA410 class - CA-410 device interface
+├── exceptions.py        # Custom exception hierarchies (CL200AError, CA410Error)
 ├── utils.py             # Serial port utilities, command formatting, checksums
-├── konica_cli.py        # CLI entry point (argparse)
+├── konica_cli.py        # CLI entry point (argparse) with device selection
 ├── logger.py            # Logging configuration
 └── version.py           # Version string
 tests/                   # Unit tests (unittest)
 ├── context.py           # Import path setup
-└── test_basic.py        # Tests for parsing, formatting, error handling (27 tests)
+├── test_basic.py        # CL-200A tests (27 tests)
+└── test_ca410.py        # CA-410 tests (19 tests)
 docs/                    # Sphinx documentation (minimal)
 setup.py                 # Package config, metadata, entry points
 ```
@@ -60,9 +63,9 @@ GitHub Actions workflow at `.github/workflows/python-tests.yml`:
 - **Style**: `snake_case` for functions/variables, `PascalCase` for classes
 - **Encoding**: UTF-8 declaration at file top (`# coding=utf-8`)
 - **Private methods**: single underscore prefix (`_connection()`)
-- **Type hints**: on all public and private methods in `cl200a.py`
-- **Return types**: NamedTuples (`EvXY`, `XYZ`, `EvUV`, `EvTcpDuv`)
-- **Exceptions**: Custom hierarchy rooted at `CL200AError` in `exceptions.py`
+- **Type hints**: on all public and private methods
+- **Return types**: NamedTuples (`EvXY`, `XYZ`, `EvUV`, `EvTcpDuv`, `LvXY`, `LvUV`, `LvTcpDuv`)
+- **Exceptions**: Custom hierarchies rooted at `CL200AError` and `CA410Error` in `exceptions.py`
 - **Docstrings**: present on public classes and methods
 - **Logging**: use `logging.getLogger(__name__)` pattern
 
@@ -73,10 +76,20 @@ GitHub Actions workflow at `.github/workflows/python-tests.yml`:
 
 ## Key Architecture
 
-- `ChromaMeterKonica` (in `cl200a.py`) is the main interface class. Supports context manager protocol (`with` statement).
-- Measurement methods: `get_ev_x_y()`, `get_x_y_z()`, `get_ev_u_v()`, `get_ev_tcp_delta_uv()`, `get_lux()` (backward compat)
-- `exceptions.py` defines error types for each CL-200A ERR code (1-3: critical, 5: over range, 6: low luminance, 7: out of range) and battery status
-- `utils.py` contains the command dictionary, serial port helpers, XOR checksum (BCC) calculation, and FTDI device auto-detection
-- Serial protocol: 9600 baud, even parity, 7 data bits, 1 stop bit (per KMSE CS-A32T.0100)
-- Frame format: `[STX] + payload + [ETX] + BCC (2-digit XOR) + CR+LF`
-- CLI entry point: `konica_cli` console script mapped to `konica.konica_cli:main`
+### CL-200A (cl200a.py)
+- `ChromaMeterKonica` is the CL-200A interface class. Supports context manager protocol.
+- Measurement methods: `get_ev_x_y()`, `get_x_y_z()`, `get_ev_u_v()`, `get_ev_tcp_delta_uv()`, `get_lux()`
+- Serial protocol: 9600 baud, even parity, 7 data bits, 1 stop bit
+- Frame format: `[STX] + payload + [ETX] + BCC (2-digit hex XOR) + CR+LF`
+
+### CA-410 (ca410.py)
+- `ColorAnalyzerCA410` is the CA-410 interface class. Supports context manager protocol.
+- Measurement methods: `get_lv_x_y()`, `get_x_y_z()`, `get_lv_u_v()`, `get_lv_tcp_duv()`, `get_luminance()`, `get_flicker()`
+- Serial protocol: 38400 baud (default), even parity, 7 data bits, 2 stop bits
+- Command format: ASCII text commands with CR delimiter, `OK00` success / `ERxx` error responses
+- Compatible with CA-210/CA-310 command set
+
+### Shared
+- `exceptions.py` defines error types for both devices
+- `utils.py` contains CL-200A command dictionary, serial port helpers, XOR checksum (BCC), FTDI auto-detection
+- CLI entry point: `konica_cli` console script with `--device` flag for device selection
