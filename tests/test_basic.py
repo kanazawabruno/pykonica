@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import unittest
-from unittest.mock import patch, MagicMock
 
 from konica.utils import cmd_formatter, cl200a_cmd_dict
 from konica.cl200a import ChromaMeterKonica, EvXY, XYZ, EvUV, EvTcpDuv
