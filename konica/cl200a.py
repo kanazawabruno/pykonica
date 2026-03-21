@@ -95,6 +95,9 @@ class ChromaMeterKonica:
                 continue
             else:
                 self.log.error('Konica Minolta CL-200A has an error. Please verify USB cable.')
+                raise CL200ACriticalError(
+                    'Failed to set PC connection mode. Please verify the USB cable and that the CL-200A is powered on and ready.'
+                )
 
     def _hold_mode(self) -> None:
         """
