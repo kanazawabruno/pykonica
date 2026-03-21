@@ -69,9 +69,17 @@ class ChromaMeterKonica:
             self._connection()
             self._hold_mode()
             self._ext_mode()
-        except SerialException:
-            err = 'Lux meter not found. Check that the cable is properly connected.'
-            self.log.exception(err)
+        except Exception as exc:
+            try:
+                if self.ser is not None:
+                    self.ser.close()
+            except Exception:
+                self.log.exception('Error while closing serial connection after setup failure')
+            if isinstance(exc, SerialException):
+                err = 'Lux meter not found. Check that the cable is properly connected.'
+                self.log.exception(err)
+            else:
+                self.log.exception('Error during Lux Meter initialization')
             raise
 
     def _connection(self) -> None:
