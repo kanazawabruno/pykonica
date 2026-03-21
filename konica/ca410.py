@@ -77,10 +77,15 @@ class ColorAnalyzerCA410:
             port: Serial port (e.g. 'COM3', '/dev/ttyUSB0'). Auto-detected if None.
             baudrate: Baud rate (default 38400, the factory setting).
             timeout: Serial read timeout in seconds.
-            probe: Probe number to select (0-based). Default is 0 (first probe).
+            probe: Reserved for future use; currently ignored. Default is 0.
         """
         self.log = logging.getLogger(__name__)
         self.probe = probe
+        if probe not in (0, None):
+            self.log.warning(
+                "Probe selection is not currently implemented; 'probe' argument is ignored (received %s).",
+                probe,
+            )
 
         if port is None:
             port = self._find_device()
