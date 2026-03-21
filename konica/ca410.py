@@ -11,7 +11,6 @@ Compatible with CA-210/CA-310 command set.
 """
 
 import logging
-from time import sleep
 from typing import NamedTuple, Optional
 
 from serial import Serial, PARITY_EVEN, SEVENBITS, STOPBITS_TWO, SerialException
