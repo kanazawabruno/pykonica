@@ -110,9 +110,10 @@ class ColorAnalyzerCA410:
             manufacturer = (p.manufacturer or '').lower()
             if 'konica' in manufacturer or 'konica' in desc or 'ca-410' in desc or 'ca-310' in desc:
                 return p.device
-        # Fall back to any FTDI device
+        # Fall back to any FTDI device (case-insensitive manufacturer match)
         for p in list_ports.comports():
-            if p.manufacturer and 'FTDI' in p.manufacturer:
+            manufacturer = (p.manufacturer or '').lower()
+            if 'ftdi' in manufacturer:
                 return p.device
         return None
 
