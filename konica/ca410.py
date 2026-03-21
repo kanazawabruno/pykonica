@@ -11,7 +11,6 @@ Compatible with CA-210/CA-310 command set.
 """
 
 import logging
-from time import sleep
 from typing import NamedTuple, Optional
 
 from serial import Serial, PARITY_EVEN, SEVENBITS, STOPBITS_TWO, SerialException
@@ -77,10 +76,15 @@ class ColorAnalyzerCA410:
             port: Serial port (e.g. 'COM3', '/dev/ttyUSB0'). Auto-detected if None.
             baudrate: Baud rate (default 38400, the factory setting).
             timeout: Serial read timeout in seconds.
-            probe: Probe number to select (0-based). Default is 0 (first probe).
+            probe: Reserved for future use; currently ignored. Default is 0.
         """
         self.log = logging.getLogger(__name__)
         self.probe = probe
+        if probe not in (0, None):
+            self.log.warning(
+                "Probe selection is not currently implemented; 'probe' argument is ignored (received %s).",
+                probe,
+            )
 
         if port is None:
             port = self._find_device()
@@ -110,9 +114,10 @@ class ColorAnalyzerCA410:
             manufacturer = (p.manufacturer or '').lower()
             if 'konica' in manufacturer or 'konica' in desc or 'ca-410' in desc or 'ca-310' in desc:
                 return p.device
-        # Fall back to any FTDI device
+        # Fall back to any FTDI device (case-insensitive manufacturer match)
         for p in list_ports.comports():
-            if p.manufacturer and 'FTDI' in p.manufacturer:
+            manufacturer = (p.manufacturer or '').lower()
+            if 'ftdi' in manufacturer:
                 return p.device
         return None
 
@@ -186,7 +191,7 @@ class ColorAnalyzerCA410:
         if not response.startswith('OK00'):
             raise CA410Error('ER00', 'Unexpected response format: {}'.format(response))
         parts = response.split(',')
-        # Skip the 'OK00' prefix and the probe/channel info
+        # Return all comma-separated fields, including 'OK00' and probe/channel info
         return parts
 
     def measure(self) -> str:

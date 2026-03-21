@@ -49,11 +49,14 @@ class ChromaMeterKonica:
     Serial params: 9600 baud, 7-bit, even parity, 1 stop bit
     """
 
-    def __init__(self) -> None:
+    def __init__(self, port: str | None = None) -> None:
         self.cmd_dict = cl200a_cmd_dict
         self.log = logging.getLogger(__name__)
 
-        self.port = serial_port_luxmeter()
+        if port is not None:
+            self.port = port
+        else:
+            self.port = serial_port_luxmeter()
         if self.port is None:
             self.log.error('No CL-200A device found. Check USB connection.')
             raise SerialException('No CL-200A device found. Check that the device is connected.')
@@ -66,9 +69,17 @@ class ChromaMeterKonica:
             self._connection()
             self._hold_mode()
             self._ext_mode()
-        except SerialException:
-            err = 'Lux meter not found. Check that the cable is properly connected.'
-            self.log.exception(err)
+        except Exception as exc:
+            try:
+                if self.ser is not None:
+                    self.ser.close()
+            except Exception:
+                self.log.exception('Error while closing serial connection after setup failure')
+            if isinstance(exc, SerialException):
+                err = 'Lux meter not found. Check that the cable is properly connected.'
+                self.log.exception(err)
+            else:
+                self.log.exception('Error during Lux Meter initialization')
             raise
 
     def _connection(self) -> None:
