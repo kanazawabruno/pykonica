@@ -30,7 +30,7 @@ def _create_device(device_type, port=None):
         return ColorAnalyzerCA410(port=port)
     else:
         from konica.cl200a import ChromaMeterKonica
-        return ChromaMeterKonica()
+        return ChromaMeterKonica(port=port)
 
 
 def main():

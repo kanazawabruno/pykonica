@@ -49,11 +49,14 @@ class ChromaMeterKonica:
     Serial params: 9600 baud, 7-bit, even parity, 1 stop bit
     """
 
-    def __init__(self) -> None:
+    def __init__(self, port: str | None = None) -> None:
         self.cmd_dict = cl200a_cmd_dict
         self.log = logging.getLogger(__name__)
 
-        self.port = serial_port_luxmeter()
+        if port is not None:
+            self.port = port
+        else:
+            self.port = serial_port_luxmeter()
         if self.port is None:
             self.log.error('No CL-200A device found. Check USB connection.')
             raise SerialException('No CL-200A device found. Check that the device is connected.')
