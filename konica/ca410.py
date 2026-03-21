@@ -186,7 +186,7 @@ class ColorAnalyzerCA410:
         if not response.startswith('OK00'):
             raise CA410Error('ER00', 'Unexpected response format: {}'.format(response))
         parts = response.split(',')
-        # Skip the 'OK00' prefix and the probe/channel info
+        # Return all comma-separated fields, including 'OK00' and probe/channel info
         return parts
 
     def measure(self) -> str:
