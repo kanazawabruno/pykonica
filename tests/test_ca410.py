@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import unittest
-from unittest.mock import patch, MagicMock
 
 from konica.ca410 import (
     ColorAnalyzerCA410,
