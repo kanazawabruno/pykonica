@@ -5,7 +5,7 @@
 **pykonica** is a Python package for controlling Konica Minolta CL-200A Chroma Meter devices via RS-232 serial communication. It provides a programmatic interface and CLI for reading luminance/chromaticity measurements.
 
 - **License**: MIT
-- **Python**: >=3.8
+- **Python**: >=3.10
 - **Package name**: `konica`
 - **Version**: 2.0.0 (defined in `konica/version.py`)
 - **Communication spec**: KMSE CS-A32T.0100
@@ -45,14 +45,14 @@ pip install -e .
 - Framework: `unittest` (standard library)
 - Test discovery: `python -m unittest discover tests/`
 - Tests live in `tests/` directory
-- CI runs tests across Python 3.8, 3.9, 3.10, 3.11, 3.12
+- CI runs tests across Python 3.10, 3.11, 3.12, 3.13, 3.14
 - Tests mock serial communication (no hardware needed)
 
 ## CI/CD
 
 GitHub Actions workflow at `.github/workflows/python-tests.yml`:
 - Triggers on push/PR to `master`/`main`
-- Matrix: Python 3.8–3.12
+- Matrix: Python 3.10–3.14
 - Steps: checkout, setup Python, install deps, run tests
 
 ## Code Conventions
@@ -69,7 +69,7 @@ GitHub Actions workflow at `.github/workflows/python-tests.yml`:
 ## Dependencies
 
 - **Runtime**: `pyserial` (serial port communication)
-- **Dev/Test**: `nose`, `sphinx`
+- **Dev/Test**: `pytest`, `sphinx`
 
 ## Key Architecture
 
