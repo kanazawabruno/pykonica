@@ -13,7 +13,7 @@ from setuptools import find_packages, setup, Command
 
 NAME = 'konica'
 DESCRIPTION = 'Python package for Konica Minolta Devices'
-URL = 'https://github.com/doulwyi/pykonica'
+URL = 'https://github.com/kanazawabruno/pykonica'
 EMAIL = 'kanazawabruno@gmail.com'
 AUTHOR = 'Bruno Kanazawa'
 

@@ -54,6 +54,9 @@ class ChromaMeterKonica:
         self.log = logging.getLogger(__name__)
 
         self.port = serial_port_luxmeter()
+        if self.port is None:
+            self.log.error('No CL-200A device found. Check USB connection.')
+            raise SerialException('No CL-200A device found. Check that the device is connected.')
         try:
             self.ser = connect_serial_port(self.port, parity=PARITY_EVEN, bytesize=SEVENBITS)
         except SerialException:
@@ -193,6 +196,11 @@ class ChromaMeterKonica:
         write_serial_port(ser=self.ser, cmd=cmd_read, sleep_time=0)
 
         result = self.ser.readline().decode('ascii')
+        if not result or len(result) < 22:
+            raise CL200ACriticalError(
+                'Invalid or incomplete response from CL-200A '
+                '(expected at least 22 bytes, got {}): {!r}'.format(len(result), result)
+            )
         self._check_status(result)
         return result
 
@@ -259,8 +267,8 @@ class ChromaMeterKonica:
         if hasattr(self, 'ser') and self.ser and self.ser.is_open:
             self.ser.close()
 
-    def __enter__(self):
+    def __enter__(self) -> 'ChromaMeterKonica':
         return self
 
-    def __exit__(self, *args):
+    def __exit__(self, *args: object) -> None:
         self.close()

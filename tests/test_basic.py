@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import unittest
-from unittest.mock import patch, MagicMock
 
 from konica.utils import cmd_formatter, cl200a_cmd_dict
 from konica.cl200a import ChromaMeterKonica, EvXY, XYZ, EvUV, EvTcpDuv
@@ -39,18 +38,18 @@ class TestCmdFormatter(unittest.TestCase):
         self.assertEqual(result[0], chr(2))
         self.assertTrue(result.endswith('\r\n'))
 
-    def test_bcc_is_two_digit_string(self):
+    def test_bcc_is_two_digit_hex_string(self):
         result = cmd_formatter('00021200')
-        # BCC is between ETX and CRLF
+        # BCC is between ETX and CRLF, encoded as 2-digit uppercase hex
         bcc = result[-4:-2]  # 2 chars before \r\n
         self.assertEqual(len(bcc), 2)
-        self.assertTrue(bcc.isdigit() or bcc[0] == '0')
+        self.assertTrue(all(c in '0123456789ABCDEF' for c in bcc))
 
     def test_known_bcc_for_command_54(self):
-        """Command 54 BCC computed via XOR of payload + ETX."""
+        """Command 54 BCC computed via XOR of payload + ETX, encoded as 2 hex digits."""
         result = cmd_formatter('00541   ')
         bcc = result[-4:-2]
-        self.assertEqual(bcc, '19')
+        self.assertEqual(bcc, '13')
 
 
 class TestExtractValue(unittest.TestCase):

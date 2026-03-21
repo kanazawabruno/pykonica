@@ -57,8 +57,7 @@ def connection_konica(ser):
     """Switch the CL-200A to PC connection mode. (Command "54").
     In order to perform communication with a PC, this command must be used to set the CL-200A to PC connection mode.
     """
-    # cmd_request = utils.cmd_formatter(self.cl200a_cmd_dict['command_54'])
-    cmd_request = chr(2) + '00541   ' + chr(3) + '13\r\n'
+    cmd_request = cmd_formatter(cl200a_cmd_dict['command_54'])
     cmd_response = cmd_formatter(cl200a_cmd_dict['command_54r'])
     return_connection = None
     for i in range(2):
@@ -132,7 +131,7 @@ def cmd_formatter(cmd):
     to_hex = ([hex(ord(c)) for c in cmd + etx])
     for i in to_hex:
         j ^= int(i, base=16)
-    bcc = str(j).zfill(2)
+    bcc = format(j, '02X')
     return stx + cmd + etx + bcc + delimiter
 
 

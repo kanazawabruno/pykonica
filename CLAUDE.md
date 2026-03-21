@@ -46,7 +46,7 @@ pip install -e .
 - Test discovery: `python -m unittest discover tests/`
 - Tests live in `tests/` directory
 - CI runs tests across Python 3.10, 3.11, 3.12, 3.13, 3.14
-- Tests mock serial communication (no hardware needed)
+- Tests focus on parsing, formatting, and error handling; hardware access may be required for full end-to-end verification
 
 ## CI/CD
 

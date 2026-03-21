@@ -35,19 +35,20 @@ def main():
     if args.verbose:
         log.setLevel(DEBUG)
 
-    k = ChromaMeterKonica()
-
-    if args.lux:
-        print(k.get_lux())
-    elif args.mode:
-        method = getattr(k, MODES[args.mode])
-        result = method()
-        for field, value in zip(result._fields, result):
-            print("{0}={1}".format(field, value))
+    if args.lux or args.mode:
+        k = ChromaMeterKonica()
+        try:
+            if args.lux:
+                print(k.get_lux())
+            elif args.mode:
+                method = getattr(k, MODES[args.mode])
+                result = method()
+                for field, value in zip(result._fields, result):
+                    print("{0}={1}".format(field, value))
+        finally:
+            k.close()
     else:
         parser.print_help()
-
-    k.close()
 
 
 if __name__ == '__main__':
