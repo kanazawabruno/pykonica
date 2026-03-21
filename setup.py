@@ -14,7 +14,7 @@ from setuptools import find_packages, setup, Command
 NAME = 'konica'
 DESCRIPTION = 'Python package for Konica Minolta Devices'
 URL = 'https://github.com/doulwyi/pykonica'
-EMAIL = 'kanazawabruno@gmail.com.com'
+EMAIL = 'kanazawabruno@gmail.com'
 AUTHOR = 'Bruno Kanazawa'
 
 REQUIRED = [
@@ -78,7 +78,7 @@ setup(
     # py_modules=['mypackage'],
 
     entry_points={
-        'console_scripts': ['konica_cli=konica_cli:main'],
+        'console_scripts': ['konica_cli=konica.konica_cli:main'],
     },
     install_requires=REQUIRED,
     include_package_data=True,
